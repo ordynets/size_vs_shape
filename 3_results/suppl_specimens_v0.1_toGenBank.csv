@@ -1,0 +1,8 @@
+Sequence_ID	organism	authority	fwd_primer_name	rev_primer_name	lat_lon	host	isolation_source	country	collection_date	collected_by 	specimen_voucher 
+KHL_9569	Subulicystidium fusisporum	Subulicystidium fusisporum Ordynets & K.H.Larss.	ITS1f	ITS4	18.3239 N 65.8172 W			Puerto Rico: Municipio Rio Grande	28-Jun-1996	K.-H.Larsson	GB: KHL 9569
+KAS_GEL_3519	Subulicystidium tropicum	Subulicystidium tropicum S.H. He & S.L. Liu		ITS4	24.0912 N 121.0337 E			Taiwan: Nantou	26-Apr-1996	G.Langer; E.Langer; C.-J.Chen	KAS: GEL 3519
+KAS_MS_4617	Subulicystidium longisporum	Subulicystidium longisporum (Pat.) Parmasto	ITS1f	ITS4	51.2928 N 9.7178 E			Germany: Hesse, Hessisch Lichtenau	8-Oct-2014	M.Striegel	KAS: MS 4617
+KAS_GEL_4878	Subulicystidium tropicum	Subulicystidium tropicum S.H. He & S.L. Liu	ITS1	ITS4	21.1289 S 55.5716 E			Reunion: Saint-Benoit, Saint-Benoit	18-Mar-1998	G.Langer; E.Langer; E.Hennen	KAS: GEL 4878
+KAS_GEL_3677	Subulicystidium inornatum	Subulicystidium inornatum Ordynets & K.H. Larss.	ITS1f	ITS4	23.4801 N 120.4491 E		dead wood	Taiwan: Chiayi	1-May-1996	G.Langer; E.Langer; C.-J.Chen	KAS: GEL 3677
+KHL_9955	Subulicystidium inornatum	Subulicystidium inornatum Ordynets & K.H. Larss.	ITS1f	ITS4	18.3161 N 65.7467 W	angiosperm tree	branch	Puerto Rico: Municipio Luquillo	6-Jun-1997	K.-H.Larsson	GB: KHL 9955
+KHL_14333	Subulicystidium tropicum	Subulicystidium tropicum S.H. He & S.L. Liu	ITS1	ITS4	24.9529 S 47.0028 E	angiosperm tree	wood	Madagascar: Toliaro, Tolagnaro	11-Mar-2010	K.-H.Larsson	O:F: KHL 14333

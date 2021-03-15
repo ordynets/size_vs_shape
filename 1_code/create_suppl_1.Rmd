@@ -1,0 +1,28 @@
+---
+title: "R Notebook"
+output: 
+---
+
+Set directory and way to access data
+```{r}
+library(here)
+library(conflicted)
+conflict_prefer("here", "here")
+```
+Upload specimen IDs and data
+```{r}
+
+sp_names <- read.csv(here("3_results", "species_names.csv"),  sep=",", stringsAsFactors=FALSE)
+annot.full <- read.csv(here("2_0_data_specimens", "SUB_data_processing_20210305.tsv"),  sep="\t")
+```
+
+Sort only required rows (n=30) out of big metadata table
+```{r}
+annot.filter = annot.full[which(annot.full$Specimen_ID %in% sp_names$Specimen_ID), ]
+annot.filter = gdata::drop.levels(annot.filter) # drop unused, "ghost" levels
+```
+
+Export data
+```{r}
+readr::write_tsv(annot.filter, file = here("3_results", "suppl_specimens_v0.0.tsv"))
+```
