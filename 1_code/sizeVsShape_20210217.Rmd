@@ -6,61 +6,60 @@ output: html_notebook
 This is an R Notebook containing code and results of comparing the performance  of shape and size traits for discrimination of species in *Subulicystidium*. 
    
 **New in this version**:  
-* this is largely a duplicate of the version 20210129 but now based on the (for safety) re-run PCA from 17.02.2021  
+* this is largely a duplicate of the version 20210129 but now based on the (for sureness) re-run PCA from 17.02.2021  
 * removed the non-relevant here description of how to create a single NEF file. 
-
+* make illustrations and tables writing to the files with desired dimensions, into kind of 'out' folder  
+  
+  
 **To do in the next version**:  
 * implement report() in the end of the script
-* make illustrations and tables writing to the files with desired dimensions, into kind of 'out' folder  
-* Work on aestetics of phylogenetic tree - it goes as a Fig to the ms.  
-* Keep actual link to species_names. 
 * move PCA analysis of NEFD to R  
 * I may also adjust longisporum name in the next analysis version when the data from Christina will be coming. Then my longisporum will become longisporum_7
-
+  
+  
 **Most important changes in the past**: 
 * analyses on image-level data, N of observations = 401. Each observation is a data from a single image, with information on min 1 spore and max 4 spores  
 * custom function for discriminant analysis that allows to shorten the script  
-
-
+  
+  
 ## Setting the work
-### Only first session
-At the very start, assign in R studio as a working directory the directory which is parent for the code, data and results directories. Then *set_here* function of the "here" package will pick this assignment by creating the file .here. Then all subsequent R sessions on this project will start with the right directory. 
-To see more examples of  "here" visit http://jenrichmond.rbind.io/post/where-is-here/
-
-
-### Every session
-Loading package "here" should notify on the correct working directory.
-
+### All is pre-set correctly now
+All code, data and results are organized into RStudio R project. After clicking the .Rproj file, this Notebook will be opened and working directory will be understood by R correctly as a directory which is parent for the code, data and results directories. 
+  
+additionally, loading package "here" should  notify on the correct working directory. "here"  will be also very helpful for accessing files in the child  directories along the script.
 ```{r}
 library(here)
 library(conflicted)
 conflict_prefer("here", "here")
 conflicted::conflict_prefer("rename", "dplyr")
 ```
+  
+  
+### This is how it was earlier
+At the very start, assign in R studio as a working directory the directory which is parent for the code, data and results directories. Then *set_here* function of the "here" package will pick this assignment by creating the file .here. Then all subsequent R sessions on this project will start with the right directory. 
+To see more examples of  "here" visit this [link](http://jenrichmond.rbind.io/post/where-is-here/)
 
 
 
 ## Load and proceed spore shape data
 
 ### Summarize symmetric variation
-Load and process the table with PCA scores for specimens (symmetric variation)
+Load and process the table with PCA scores of the spores (symmetric variation)
 ```{r}
 scores_symm_raw <- read.csv(here("2_3_data_shape", "pca_202102", "1_symm", "30specimens_clean_symm.pcs"),  sep="\t")
 
-# add column to be filled in later with relevant IDs
+# add columns to be filled in later with relevant IDs
 scores_symm_raw <- cbind(Specimen_ID = NA, scores_symm_raw)
 scores_symm_raw <- cbind(Image_ID = NA, scores_symm_raw)
 
-
-# fill in column Specimen_ID based on content of the column DATA_NAME
+# fill in column Specimen_ID based on the content of the column DATA_NAME
 library(stringr)
 strings <- c("^ARAN", "^CWU", "^KHL", "^LR", "^LY", "^Ordynets")
 scores_symm_raw$Specimen_ID <- ifelse(str_detect(scores_symm_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*)_.*$", "\\1", scores_symm_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_symm_raw$DATA_NAME))
 
-# fill in column Image_ID based on content of the column DATA_NAME
+# fill in column Image_ID based on the content of the column DATA_NAME
 scores_symm_raw$Image_ID <- ifelse(str_detect(scores_symm_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_symm_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_symm_raw$DATA_NAME))
 ```
-
 
 
 Plot PCA scores as scatterplots (symmetric variation)
@@ -72,11 +71,10 @@ theme(axis.text.x = element_text(angle = 90))
 plot(pca_symm_plot)
 ```
 
-Summarize symmetric variation at the specimen level
+Summarize symmetric variation at the image ID level
 `.groups = 'drop'` argument in ```summarise()``` will help to remove a "friendly warning"  
 ``` `summarise()` ungrouping output (override with `.groups` argument)```  
-The explanation is available at https://stackoverflow.com/questions/62140483/how-to-interpret-dplyr-message-summarise-regrouping-output-by-x-override
-
+The explanation is available [here](https://stackoverflow.com/questions/62140483/how-to-interpret-dplyr-message-summarise-regrouping-output-by-x-override)
 ```{r}
 library(dplyr)
 scores_symm_summ <- scores_symm_raw %>% 
@@ -90,21 +88,21 @@ scores_symm_summ <- dplyr::rename(scores_symm_summ, PC1_symm_mean = PC1)
 
 
 ### Summarize asymmetric variation
-Load and process the table with PCA scores for specimens (asymmetric variation)
+Load and process the table with PCA scores for spores (asymmetric variation)
 
 ```{r}
 scores_asym_raw <- read.csv(here("2_3_data_shape", "pca_202102", "2_asym", "30specimens_clean_asym.pcs"),  sep="\t")
 
-# add column to be filled in later with relevant IDs
+# add columns to be filled in later with relevant IDs
 scores_asym_raw <- cbind(Specimen_ID = NA, scores_asym_raw)
 scores_asym_raw <- cbind(Image_ID = NA, scores_asym_raw)
 
-# fill in column Specimen_ID based on content of the column DATA_NAME.
+# fill in column Specimen_ID based on the content of the column DATA_NAME.
 # "strings" object was created above and is valid here as is.
 # Package "stringr" is necessary and was loaded earlier.
 scores_asym_raw$Specimen_ID <- ifelse(str_detect(scores_asym_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*)_.*$", "\\1", scores_asym_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_asym_raw$DATA_NAME))
 
-# fill in column Image_ID based on content of the column DATA_NAME.
+# fill in column Image_ID based on the content of the column DATA_NAME.
 scores_asym_raw$Image_ID <- ifelse(str_detect(scores_asym_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_asym_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_asym_raw$DATA_NAME))
 ```
 
@@ -126,7 +124,6 @@ plot(pca_asym_plot)
 
 Summarize asymmetric variation at image level
 ```{r}
-# Averaging per specimen
 library(dplyr)
 scores_asym_summ <- scores_asym_raw %>% 
   group_by(Image_ID) %>% 
@@ -138,17 +135,17 @@ scores_asym_summ <- scores_asym_raw %>%
 
 
 ### Summarize global variation
-Load and process the table with PCA scores for specimens (global variation)
+Load and process the table with PCA scores for spores (global variation)
 ```{r}
 scores_glob_raw <- read.csv(here("2_3_data_shape", "pca_202102", "3_glob", "30specimens_clean_glob.pcs"),  sep="\t")
 
-# add column to be filled in later with relevant IDs
+# add columns to be filled in later with relevant IDs
 scores_glob_raw <- cbind(Specimen_ID = NA, scores_glob_raw)
 scores_glob_raw <- cbind(Image_ID = NA, scores_glob_raw)
 
 # fill in column Specimen_ID based on content of the column DATA_NAME
-# "strings" object was created above and is valid here as is.
-# Package "stringr" is necessary and was loaded eralier.
+# "strings" object was created above and is valid here as is
+# Package "stringr" is necessary and was loaded earlier
 scores_glob_raw$Specimen_ID <- ifelse(str_detect(scores_glob_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*)_.*$", "\\1", scores_glob_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_glob_raw$DATA_NAME))
 
 scores_glob_raw$Image_ID <- ifelse(str_detect(scores_glob_raw$DATA_NAME, paste(strings, collapse = "|")), gsub("^([^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_glob_raw$DATA_NAME), gsub("^([^_]*_[^_]*_[^_]*_[^_]*_[^_]*)_.*$", "\\1", scores_glob_raw$DATA_NAME))
@@ -162,9 +159,8 @@ geom_point()
 plot(pca_glob_plot)
 ```
 
-Summarize global variation at specimen level
+Summarize global variation at the image level
 ```{r}
-# Averaging per specimen
 library(dplyr)
 scores_glob_summ <- scores_glob_raw %>% 
   group_by(Image_ID) %>% 
@@ -186,27 +182,34 @@ data_size_raw <- suppressWarnings(plyr::ldply(import.size, read_csv))
 ```
 
 
-Then the spreadsheeet is transformed to put length and width  for each spore to separate columns of one row.    Warning message from dplyr when binding length and width columns "New names: * X1 -> X1...1..." that appears after the code chunk can be ignored.  
+Then the spreadsheet is transformed to put length and width  of each spore into separate columns of one row.  
+Warning message from dplyr when binding length and width columns "New names: * X1 -> X1...1..." that appears after the code chunk can be ignored.  
 Then, length to width ratio is added as an additional column.   
 Finally, column "Image_ID" is created.  
 
 ```{r}
 library(dplyr)
+# find spore lengths
 data_size_raw_odd <- data_size_raw %>% dplyr::slice(which(row_number() %% 2 == 1))
 colnames(data_size_raw_odd)[which(names(data_size_raw_odd) == "Label")] <- "Photo_ID"
 
+# find spore widths
 data_size_raw_even <- data_size_raw %>% dplyr::slice(which(row_number() %% 2 == 0)) 
 colnames(data_size_raw_even)[which(names(data_size_raw_even) == "Length")] <- "Width"
 
+# bind length and width values and leave just necessary values
 data_size_tiny <- bind_cols(data_size_raw_odd, data_size_raw_even)
 data_size_tiny_simple <-data_size_tiny[, c("Photo_ID", "Length", "Width")]
 
+# add length to width ratio as an additional trait
 data_size_tiny_simple <- transform(data_size_tiny_simple, Length_to_width_ratio = Length / Width)
 data_size_tiny_simple$Length_to_width_ratio <- round(data_size_tiny_simple$Length_to_width_ratio, 2)
 
+# add column for image IDs
 data_size_tiny_simple <- cbind(Image_ID = NA, data_size_tiny_simple)
 
-## code that using regex is based on the solution for gsub 
+# fill the column for image IDs
+## code that uses regex is based on the solution for gsub 
 ## ## https://stackoverflow.com/questions/39366759/regex-to-extract-values-between-2-underscores-including-a-value-that-is-an-unde
 ## https://stackoverflow.com/questions/7449564/regex-return-all-before-the-second-occurrence 
 
@@ -220,6 +223,7 @@ data_size_tiny_simple$Image_ID <- gsub(pattern = ".bmp*", replacement = "", x = 
 
 Summarize size data at the image level 
 ```{r}
+library(dplyr) 
 size_summ <- data_size_tiny_simple %>% 
   group_by(Image_ID) %>% 
   summarise(Length_mean=mean(Length),
@@ -229,20 +233,12 @@ size_summ <- data_size_tiny_simple %>%
               .groups = 'drop')
 ```
 
-
-In this way I exported specimen IDs (n = 30) and assigned them to species for further analysis.
-If the new specimens will be added to the dataset after summer 2020, the table with species name labels will be updated. 
-```{r}
-# not run
-# readr::write_csv(size_summ$Specimen_ID, file = here("3_results", "species_names_raw.csv", quote = F, sep = ",")
-```
-
-
 The chunk below allows to add a variable with an alternative size definition, following Claude 2008 book (p. 98-99).  
-It is a possible alternative to single length and width measurements.  
+It is a possible alternative to the single length and width measurements.  
 This measure of size would correlate less with shape variables, which is a desired behavior.  
 However, if used in in discriminant analysis, it did not allow to gain in species prediction (tried in Feb 2020, not shown in the code below but can be easily added). 
 ```{r}
+## needs dplyr
 # size_summ$Size_scaled <- NA
 # size_summ$Size_scaled <- sqrt(size_summ$Length_mean * size_summ$Width_mean)
 # size_summ <- size_summ %>% relocate(Size_scaled, .before = 'Length_mean') # cosmetic changes 
@@ -250,22 +246,28 @@ However, if used in in discriminant analysis, it did not allow to gain in specie
 
 
 
-## Unite shape and size data
-### Check that Images IDs are in the same order in all objects. They will serve as grouping variable
+## Unite shape and size data  
 
-Check for image level data (n=401 in Dez 2020). Here, no need to sort the data in each group because they are all after applying ```summarise()``` function
+### Check that Images IDs are in the same order in all objects. They will serve as grouping variable
+Check for image level data (n=401 in Dez 2020). Here, no need to sort the data in each group because they are all in the sam order after applying ```summarise()``` function
 ```{r}
 sapply(list(scores_symm_summ$Image_ID, scores_asym_summ$Image_ID, scores_glob_summ$Image_ID),
             FUN = all.equal.list, size_summ$Image_ID)
 ```
 
 
-### Create a united table with all traits
-
+### Create a united table with all traits  
 Join separate dataframes
 ```{r}
 library(dplyr)
-traits_merged <- scores_symm_summ %>% right_join(scores_asym_summ) %>% right_join(scores_glob_summ) %>% right_join(size_summ, by = "Image_ID")
+traits_merged <- scores_symm_summ %>% right_join(scores_asym_summ, by = "Image_ID") %>% right_join(scores_glob_summ, by = "Image_ID") %>% right_join(size_summ, by = "Image_ID")
+```
+
+In this way (chunk below) I exported specimen IDs (n = 30) and assigned them manualy to species for further analysis.
+If the new specimens will be added to the dataset after summer 2020, the table with species name labels should be updated. 
+```{r}
+# not run
+readr::write_csv(as.data.frame(table(traits_merged$Specimen_ID)), file = here("3_results", "species_names_raw.csv"))
 ```
 
 Add a column with species names based on data from another table
@@ -282,7 +284,6 @@ traits_merged <- data.frame(traits_merged_dt)
 
 Export the table with traits on image level for supplementary
 ```{r}
-# not run
 readr::write_csv(traits_merged, file = here("3_results", "traits_per_image.csv"))
 ```
 
@@ -328,6 +329,7 @@ gg_size_Q <-ggplot(traits_merged, aes(x=Length_to_width_ratio_mean, color=Specie
   labs(tag = "F", x = "Length to width ratio")
 ```
 
+
 ### Scatterplots for traits in a single combined plot
 ```{r}
 #conflicted::conflict_prefer("rename", "dplyr")
@@ -356,8 +358,6 @@ dev.off()
 ```
 
 
-
-
 ### Trait data: normality test for each level of the grouping variable
 ```{r}
 shL <- apply(traits_merged[,4:12], 2,  function(x) {RVAideMemoire::byf.shapiro(x ~ Species_ID, data = traits_merged)$tab}) # creates list
@@ -375,7 +375,6 @@ shapiroNN <- shD$Shapiro_p <= 0.05
 nrow(shD[shapiroNN,]) / nrow(shD)
 ```
 There is no universal multivariate normality for levels (defined by species) within traits.
-
 
 
 ### Trait data: test of variance equality in trait variables between species
@@ -403,11 +402,10 @@ hist(traits_merged$Length_to_width_ratio_mean, main = NULL, xlab = "Length to wi
 ```
 
 
-
 ### Multicollinearity check: overall correlations between variables
 
 #### Way 1
-Multicollinearity check: corrplot
+Multicollinearity check: corrplot  
 Get correlation values (Spearman coefficient)
 ```{r}
 traits_merged_forCorr <- dplyr::select(traits_merged,-c("Species_ID", "Image_ID", "Specimen_ID", "N_spores"))
@@ -418,11 +416,8 @@ names(traits_merged_forCorr) <- c("PC1 symmetric", "PC1 asymmetric", "PC2 asymme
 M <- cor(traits_merged_forCorr, method="spearman")
 ```
 
-
-Computing the p-value of correlations
-To compute the matrix of p-value, a custom R function is used
-Source: 
-http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram 
+Computing the p-value of correlations  
+To compute the matrix of p-value, a custom R function is used. Source is [here](http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram)
 ```{r}
 # mat : is a matrix of data
 # ... : further arguments to pass to the native R cor.test function
@@ -442,14 +437,12 @@ cor.mtest <- function(mat, ...) {
 }
 ```
 
-
 Get p (significance) values for Spearman correlation coefficient
 These could not be estimated for all cross-comparisons, apparently due to small data size.
 ```{r}
 p.mat <- cor.mtest(M, method="spearman", exact=FALSE)
 ```
 
-, fig.align = "center", fig.height = 5, fig.width = 5
 Plot correlation values with highlighting only significant (at p=0.05) correlation values
 ```{r}
 library(corrplot)
@@ -495,8 +488,6 @@ dev.off()
 # dev.off()
 ```
 
-
-
 #### Way 2
 Multicollinearity check: original data: psych
 ```{r}
@@ -508,7 +499,6 @@ Multicollinearity check:log-transformed data: psych:  does not change much and k
 # psych::pairs.panels(log2(traits_merged[,4:12]), gap = 0, pch = 21, bg = c(1:10)[factor(traits_merged$Species_ID)])
 ```
 
-
 #### Way 3
 Multicollinearity check: original data: ggplot version
 ```{r message=FALSE}
@@ -517,18 +507,14 @@ Multicollinearity check: original data: ggplot version
 
 
 
-
-
 ## Discriminant analysis
 
 The non-normal distribution and unequal variance are present. This prevents from using linear discriminant analysis or quadratic discriminant analysis. I will use flexible discriminant analysis.
 
-My code is inspired by:
-https://rstudio-pubs-static.s3.amazonaws.com/35817_2552e05f1d4e4db8ba87b334101a43da.html 
+My code is inspired by [this post](https://rstudio-pubs-static.s3.amazonaws.com/35817_2552e05f1d4e4db8ba87b334101a43da.html)
 
 
-Universal function for my discriminant analysis of fungal spores
-
+Universal function for my discriminant analysis of fungal spores:
 ```{r}
 myFDA <- function(y, x, mydata, part, rep){
   # seed for reproducibility
@@ -555,7 +541,7 @@ myFDA <- function(y, x, mydata, part, rep){
 }
 ```
 
-### 
+Now apply the function to particular spore traits:
 ```{r}
 # Symmetric shape variation
 succ_S <- myFDA('Species_ID', 'PC1_symm_mean', mydata = traits_merged, part = 0.7, rep = 1000)
@@ -607,7 +593,7 @@ succ_all_df$Predictors <- c('S', 'A', 'G', 'LW', 'Q', 'QLW',  'GLW', 'SALW')
 names(succ_all_df)[1] <- 'Success' 
 succ_all_df[1] <- round(succ_all_df[1]*100, 1) # switch to percents
 
-# make the predicors factors, instead of characters. This will keep their original order while plotting. 
+# make predicors to be factors, instead of characters. This will keep their original order while plotting. 
 succ_all_df$Predictors <- factor(succ_all_df$Predictors, levels = succ_all_df$Predictors)
 p <- ggplot(succ_all_df, aes(x=reorder(Predictors, Success), y=Success)) +
   geom_bar(stat="identity", fill="steelblue") +
@@ -618,10 +604,11 @@ p <- ggplot(succ_all_df, aes(x=reorder(Predictors, Success), y=Success)) +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 12))
 p
 ```
+
 Save id success rates plot
 ```{r}
 # tiff
-tiff(file = here::here("3_results", "fig_success.tiff"), height= 9, width=12, units = 'cm', res = 600,
+tiff(file = here::here("3_results", "fig_success_1000rep.tiff"), height= 9, width=12, units = 'cm', res = 600,
      compression = "lzw", family = "sans")
 print(p)
 dev.off()
@@ -643,6 +630,7 @@ seq <- readDNAStringSet(here::here("2_1_data_dna", "202103", "its_30seq.fasta"))
 # seq@ranges@NAMES # seq names are here, work on names later if necessary
 ```
 
+
 ### Multiple sequence alignment (MSA)
 ```{r}
 library(msa)
@@ -653,6 +641,7 @@ library(ape)
 # convert the alignment to DNAbin
 ali_bin <- as.DNAbin(ali_XString)
 ```
+
 
 ### Plot MSA
 #### Untrimmed MSA
@@ -665,14 +654,13 @@ image(ali_bin, cex.lab = 0.8)
 Trimm the ends of aligment and plot again
 ```{r}
 # package ips is required
-# to make ips working properly, I had to install XML package from binary
+# to make ips working properly, I had to install XML package from binary in the following way:
 # install.packages("XML", type = "binary")
 library(ips)
 ali_trimmed <- trimEnds(ali_bin, min.n.seq = 15)
 par(mar=c(3,10,3,9))
 image(ali_trimmed, cex.lab = 0.8)
 ```
-
 
 ### Maximum Likelihood phylogenetic analysis
 ```{r}
@@ -697,6 +685,7 @@ What was the best substitution model?
 ```{r}
 bestModel
 ```
+
 Save the tree to file
 ```{r}
 ape::write.tree(tree.bs, file = here::here("3_results", "tree_1000bs.newick"))
@@ -727,7 +716,7 @@ Now setting all aestetics
 p1 <- p0 + 
   geom_tree(size=0.1) +
   geom_tiplab(aes(color = Species_ID), key_glyph = draw_key_point, size=2, align=F, hjust=-0.01) + 
-  geom_text2(aes(subset = !isTip, label=label), size = 2, vjust = -0.7, hjust = 1.2) + 
+  geom_text2(aes(subset = !isTip, label = round(as.numeric(label), digits = 0)), size = 2, vjust = -0.7, hjust = 1.2) + 
   geom_treescale(linesize = 0.5, fontsize = 2, x = 0.85, y = 16.5) + 
   geom_text(label="substitutions per site", x=1, y=16.0, 
             size = 6 / .pt, fontface = 'plain', family = 'sans', stat = "unique") + 
@@ -743,11 +732,10 @@ p1 <- p0 +
   # +labs(col="Subulicystidium \n species") # would change legend title
 ```
 
-
 Print the tree to a file(s)
 ```{r}
 # tiff via tiff()
-tiff(filename = here::here("3_results", "fig_tree.tiff"), height= 12, width=9, units = 'cm', res = 600, 
+tiff(filename = here::here("3_results", "fig_tree_1000bs.tiff"), height= 12, width=9, units = 'cm', res = 600, 
      compression = "lzw", family = "sans")
 print(p1)
 dev.off()
@@ -765,5 +753,12 @@ dev.off()
 # print(p1)
 # dev.off()
 ```
+## References
 
+Generates the bibliography of all used R packages and R version, and a paragraph for the Methods part of thesis (or paper)
+```{r}
+# package "report" has to be installed https://easystats.github.io/report/articles/report.html
+report::report(sessionInfo())
+```
+  
 End of the script.
