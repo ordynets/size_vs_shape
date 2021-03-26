@@ -26,3 +26,10 @@ Export data
 ```{r}
 readr::write_tsv(annot.filter, file = here("3_results", "suppl_specimens_v0.0.tsv"))
 ```
+
+Used packages
+```{r}
+# package "report" has to be installed https://easystats.github.io/report/articles/report.html
+report::report(sessionInfo())
+```
+
